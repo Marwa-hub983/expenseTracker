@@ -41,7 +41,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             TextFeildWidget(
               controller: titleControlller,
               labelText: 'Expense Title',
-            ),
+            ),  SizedBox(height: ResponsiveUtils.scaleH(context, 12)),
+                TextFeildWidget(controller: categoryController, labelText: 'Category'),
             SizedBox(height: ResponsiveUtils.scaleH(context, 12)),
             TextFeildWidget(controller: amountController, labelText: 'Amount'),
             SizedBox(height: ResponsiveUtils.scaleH(context, 20)),
