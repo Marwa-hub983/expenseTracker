@@ -4,7 +4,7 @@ import 'package:expense_trackerapp/shared/constants/colors.dart';
 import 'package:expense_trackerapp/shared/routes/routes.dart';
 import 'package:expense_trackerapp/shared/themes/font_palette.dart';
 import 'package:expense_trackerapp/shared/utils/responsive_utils.dart';
-import 'package:expense_trackerapp/shared/widgets/snackbars/snackbar.dart';
+
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -123,6 +123,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           0,
           (sum, e) => sum + e.amount,
         );
+        // const monthlyincome=
+        // final savings=
         return Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
@@ -357,38 +359,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const monthlyBudget = 10000.0;
     final box = Hive.box<ExpenseModel>('expenses');
 
-    final now = DateTime.now();
+
+    return ValueListenableBuilder(
+      valueListenable: box.listenable(),
+      builder: (context, Box<ExpenseModel> box, _) {
+            final now = DateTime.now();
     double monthlyExpenses = box.values
         .where((e) => e.date.month == now.month && e.date.year == now.year)
         .fold(0, (sum, expense) => sum + expense.amount);
     double progress = monthlyExpenses / monthlyBudget;
     if (progress > 1) progress = 1;
-    return _SectionCard(
-      title: 'BUDGET GOAL',
-      child: Center(
-        child: SizedBox(
-          width: 140,
-          height: 140,
-          child: CustomPaint(
-            painter: _RingPainter(progress: progress, color: kAccentYellow),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '${(progress * 100).toStringAsFixed(0)}%',
-                    style: FontPalette.hW800S26.copyWith(color: kTextPrimary),
+        return _SectionCard(
+          title: 'BUDGET GOAL',
+          child: Center(
+            child: SizedBox(
+              width: 140,
+              height: 140,
+              child: CustomPaint(
+                painter: _RingPainter(progress: progress, color: kAccentYellow),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${(progress * 100).toStringAsFixed(0)}%',
+                        style: FontPalette.hW800S26.copyWith(color: kTextPrimary),
+                      ),
+                      Text(
+                        'of Goal',
+                        style: TextStyle(color: kTextSecondary, fontSize: 12),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'of Goal',
-                    style: TextStyle(color: kTextSecondary, fontSize: 12),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 

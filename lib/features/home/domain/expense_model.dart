@@ -15,11 +15,13 @@ class ExpenseModel extends HiveObject {
 
   @HiveField(3)
   final DateTime date;
-
+@HiveField(4)
+final String? note;
   ExpenseModel({
     required this.title,
     required this.amount,
     required this.category,
     required this.date,
+     this.note
   });
 }
