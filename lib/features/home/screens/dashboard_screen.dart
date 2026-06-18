@@ -1,8 +1,15 @@
+import 'package:expense_trackerapp/features/home/domain/expense_model.dart';
+import 'package:expense_trackerapp/shared/app/list/helper.dart';
 import 'package:expense_trackerapp/shared/constants/colors.dart';
+import 'package:expense_trackerapp/shared/routes/routes.dart';
+import 'package:expense_trackerapp/shared/themes/font_palette.dart';
+import 'package:expense_trackerapp/shared/utils/responsive_utils.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-
+import 'package:go_router/go_router.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:hive_ce_flutter/adapters.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -41,7 +48,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-    //  floatingActionButton: FloatingActionButton(onPressed: (){},backgroundColor: kBalanceYellow,child: Icon(Icons.add),),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.push(routeAddExpense);
+        },
+        backgroundColor: kBalanceYellow,
+        child: Icon(Icons.add, color: kBlack),
+      ),
     );
   }
 
@@ -59,8 +72,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: kAccentPurple,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.hexagon_outlined,
-                color: Colors.white, size: 18),
+            child: const Icon(
+              Icons.hexagon_outlined,
+              color: Colors.white,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 10),
           const Text(
@@ -80,8 +96,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: kDivider),
             ),
-            child: const Icon(Icons.notifications_outlined,
-                color: kTextSecondary, size: 20),
+            child: const Icon(
+              Icons.notifications_outlined,
+              color: kTextSecondary,
+              size: 20,
+            ),
           ),
         ],
       ),
@@ -90,6 +109,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // ── Balance Card ───────────────────────────────────────────────────────────
   Widget _buildBalanceCard() {
+    final box = Hive.box<ExpenseModel>('expenses');
+    double totalExpenses = box.values.fold(
+      0,
+      (sum, expense) => sum + expense.amount,
+    );
+    final now = DateTime.now();
+    double monthlyExpenses = box.values
+        .where((e) => e.date.month == now.month && e.date.year == now.year)
+        .fold(0, (sum, expense) => sum + expense.amount);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -105,26 +133,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'TOTAL BALANCE',
-            style: TextStyle(
-              color: kTextSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.5,
-            ),
+            style: FontPalette.hW600S11.copyWith(color: kTextSecondary),
           ),
-          const SizedBox(height: 6),
-          const Text(
-            '\$24,580.00',
-            style: TextStyle(
-              color: kTextPrimary,
-              fontSize: 38,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -1,
-            ),
+          SizedBox(height: ResponsiveUtils.scaleH(context, 8)),
+          Text(
+            'Rs. $totalExpenses',
+            style: FontPalette.hW800S26.copyWith(color: kTextPrimary),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: ResponsiveUtils.scaleH(context, 16)),
           Row(
             children: [
               // Monthly spending
@@ -137,26 +155,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         color: Colors.white.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.arrow_downward_rounded,
-                          color: kTextSecondary, size: 14),
+                      child: const Icon(
+                        Icons.arrow_downward_rounded,
+                        color: kTextSecondary,
+                        size: 14,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('MONTHLY\nSPENDING',
-                            style: TextStyle(
-                                color: kTextSecondary,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5,
-                                height: 1.4)),
+                      children:  [
+                        Text(
+                          'MONTHLY\nSPENDING',
+                          style: FontPalette.hW600S11.copyWith(color: kTextSecondary)
+                        ),
                         SizedBox(height: 2),
-                        Text('\$4,215.50',
-                            style: TextStyle(
-                                color: kTextPrimary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700)),
+                        Text(
+                         'RS. $monthlyExpenses',
+                          style: FontPalette.hW700S11.copyWith(color: kTextPrimary)
+                        ),
                       ],
                     ),
                   ],
@@ -174,25 +191,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         color: kAccentGreen.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.savings_outlined,
-                          color: kAccentGreen, size: 14),
+                      child: const Icon(
+                        Icons.savings_outlined,
+                        color: kAccentGreen,
+                        size: 14,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        Text('SAVINGS',
-                            style: TextStyle(
-                                color: kTextSecondary,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5)),
+                        Text(
+                          'SAVINGS',
+                          style: TextStyle(
+                            color: kTextSecondary,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
                         SizedBox(height: 2),
-                        Text('\$1,850.25',
-                            style: TextStyle(
-                                color: kAccentGreen,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700)),
+                        Text(
+                          '\$1,850.25',
+                          style: TextStyle(
+                            color: kAccentGreen,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -217,10 +243,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       title: 'SPENDING ANALYSIS',
       child: Column(
         children: items
-            .map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _spendingRow(item),
-                ))
+            .map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _spendingRow(item),
+              ),
+            )
             .toList(),
       ),
     );
@@ -240,11 +268,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            Text(item.title,
-                style: const TextStyle(
-                    color: kTextPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500)),
+            Text(
+              item.title,
+              style: const TextStyle(
+                color: kTextPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             const Spacer(),
             Text(
               '${item.amount} (${item.percent.toInt()}%)',
@@ -280,14 +311,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('75%',
-                      style: TextStyle(
-                          color: kTextPrimary,
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800)),
-                  Text('of Goal',
-                      style:
-                          TextStyle(color: kTextSecondary, fontSize: 12)),
+                  Text(
+                    '75%',
+                    style: TextStyle(
+                      color: kTextPrimary,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    'of Goal',
+                    style: TextStyle(color: kTextSecondary, fontSize: 12),
+                  ),
                 ],
               ),
             ),
@@ -299,60 +334,120 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // ── Recent Transactions ────────────────────────────────────────────────────
   Widget _buildRecentTransactions() {
-    final txns = [
-      _Txn('Whole Foods Market', 'Groceries · Today, 10:45 AM',
-          '-\$142.30', Icons.shopping_cart_outlined, kAccentPurple),
-      _Txn('Uber Technologies', 'Transport · Yesterday',
-          '-\$24.50', Icons.directions_car_outlined, kAccentBlue),
-      _Txn('Rent Deposit', 'Rent · 2 days ago',
-          '-\$2,100.00', Icons.home_outlined, kAccentYellow),
-    ];
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final box = Hive.box<ExpenseModel>('expenses');
+    return ValueListenableBuilder(
+      valueListenable: box.listenable(),
+      builder: (context, Box<ExpenseModel> box, _) {
+        if (box.isEmpty) {
+          return const Center(child: Text('No Expenses Added'));
+        }
+        final expenses = box.values.toList().reversed.toList();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('RECENT TRANSACTIONS',
-                style: TextStyle(
-                    color: kTextSecondary,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.5)),
-            GestureDetector(
-              onTap: () {},
-              child: const Text('View All',
-                  style: TextStyle(
-                      color: kAccentPurple,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600)),
+            Text('RECENT TRANSACTIONS'),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: expenses.length,
+
+              itemBuilder: (context, index) {
+                final expense = expenses[index];
+                return Card(
+                  color: kCard,
+                  child: ListTile(
+                    title: Text(expense.title),
+                    subtitle: Text(formatExpenseDate(expense.date)),
+                    trailing: Text('${expense.amount}'),
+                  ),
+                );
+              },
             ),
           ],
-        ),
-        const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: kCard,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: kDivider),
-          ),
-          child: Column(
-            children: txns.asMap().entries.map((e) {
-              final isLast = e.key == txns.length - 1;
-              return Column(
-                children: [
-                  _txnRow(e.value),
-                  if (!isLast)
-                    const Divider(
-                        color: kDivider, height: 1, indent: 16, endIndent: 16),
-                ],
-              );
-            }).toList(),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
+  // Widget _buildRecentTransactions() {
+  //   final txns = [
+  //     _Txn(
+  //       'Whole Foods Market',
+  //       'Groceries · Today, 10:45 AM',
+  //       '-\$142.30',
+  //       Icons.shopping_cart_outlined,
+  //       kAccentPurple,
+  //     ),
+  //     _Txn(
+  //       'Uber Technologies',
+  //       'Transport · Yesterday',
+  //       '-\$24.50',
+  //       Icons.directions_car_outlined,
+  //       kAccentBlue,
+  //     ),
+  //     _Txn(
+  //       'Rent Deposit',
+  //       'Rent · 2 days ago',
+  //       '-\$2,100.00',
+  //       Icons.home_outlined,
+  //       kAccentYellow,
+  //     ),
+  //   ];
+
+  //   return Column(
+  //     children: [
+  //       Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           const Text(
+  //             'RECENT TRANSACTIONS',
+  //             style: TextStyle(
+  //               color: kTextSecondary,
+  //               fontSize: 11,
+  //               fontWeight: FontWeight.w600,
+  //               letterSpacing: 1.5,
+  //             ),
+  //           ),
+  //           GestureDetector(
+  //             onTap: () {},
+  //             child: const Text(
+  //               'View All',
+  //               style: TextStyle(
+  //                 color: kAccentPurple,
+  //                 fontSize: 12,
+  //                 fontWeight: FontWeight.w600,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       const SizedBox(height: 12),
+  //       Container(
+  //         decoration: BoxDecoration(
+  //           color: kCard,
+  //           borderRadius: BorderRadius.circular(20),
+  //           border: Border.all(color: kDivider),
+  //         ),
+  //         child: Column(
+  //           children: txns.asMap().entries.map((e) {
+  //             final isLast = e.key == txns.length - 1;
+  //             return Column(
+  //               children: [
+  //                 _txnRow(e.value),
+  //                 if (!isLast)
+  //                   const Divider(
+  //                     color: kDivider,
+  //                     height: 1,
+  //                     indent: 16,
+  //                     endIndent: 16,
+  //                   ),
+  //               ],
+  //             );
+  //           }).toList(),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _txnRow(_Txn txn) {
     return Padding(
@@ -373,40 +468,49 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(txn.title,
-                    style: const TextStyle(
-                        color: kTextPrimary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600)),
+                Text(
+                  txn.title,
+                  style: const TextStyle(
+                    color: kTextPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text(txn.subtitle,
-                    style: const TextStyle(
-                        color: kTextSecondary, fontSize: 11)),
+                Text(
+                  txn.subtitle,
+                  style: const TextStyle(color: kTextSecondary, fontSize: 11),
+                ),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(txn.amount,
-                  style: const TextStyle(
-                      color: kTextPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700)),
+              Text(
+                txn.amount,
+                style: const TextStyle(
+                  color: kTextPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 4),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: kAccentGreen.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text('COMPLETED',
-                    style: TextStyle(
-                        color: kAccentGreen,
-                        fontSize: 8,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5)),
+                child: const Text(
+                  'COMPLETED',
+                  style: TextStyle(
+                    color: kAccentGreen,
+                    fontSize: 8,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ),
             ],
           ),
@@ -436,12 +540,15 @@ class _SectionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                  color: kTextSecondary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.5)),
+          Text(
+            title,
+            style: const TextStyle(
+              color: kTextSecondary,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.5,
+            ),
+          ),
           const SizedBox(height: 16),
           child,
         ],
