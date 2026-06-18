@@ -1,4 +1,4 @@
-import 'package:expense_trackerapp/features/home/domain/expense_model.dart';
+import 'package:expense_trackerapp/features/dashboard/domain/expense_model.dart';
 import 'package:expense_trackerapp/shared/app/list/helper.dart';
 import 'package:expense_trackerapp/shared/constants/colors.dart';
 import 'package:expense_trackerapp/shared/routes/routes.dart';
@@ -49,12 +49,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push(routeAddExpense);
-        },
-        backgroundColor: kBalanceYellow,
-        child: Icon(Icons.add, color: kBlack),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 90),
+        child: FloatingActionButton(
+          
+          onPressed: () {
+            context.push(routeAddExpense);
+          },
+          backgroundColor: kBalanceYellow,
+          child: Icon(Icons.add, color: kBlack),
+        ),
       ),
     );
   }

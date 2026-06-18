@@ -1,4 +1,5 @@
-import 'package:expense_trackerapp/features/home/domain/expense_model.dart';
+import 'package:expense_trackerapp/features/dashboard/domain/expense_model.dart';
+import 'package:expense_trackerapp/shared/widgets/appBar/appbar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
@@ -82,13 +83,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF020C24),
 
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF020C24),
-        elevation: 0,
-        title: const Text(
-          'Hive Expense',
-          style: TextStyle(color: Colors.white),
-        ),
+      appBar: AppbarWidget(
+title: 'EXPENSE TRACKER',
+
       ),
 
       body: SafeArea(

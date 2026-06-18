@@ -2,7 +2,7 @@
 import 'package:expense_trackerapp/shared/constants/colors.dart';
 import 'package:expense_trackerapp/shared/themes/font_palette.dart';
 import 'package:expense_trackerapp/shared/utils/responsive/responsive.dart';
-import 'package:expense_trackerapp/shared/utils/responsive_utils.dart';
+
 import 'package:flutter/material.dart';
 
 
@@ -14,7 +14,7 @@ class AppbarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.logo = false,
     this.centerTitle = true,
     this.actions = const [],
-    this.color = kWhite,
+    this.color = const Color(0xFF020C24),
     this.iconColor,
     this.actionTitle,
     this.titleColor,
@@ -47,7 +47,7 @@ class AppbarWidget extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: Responsive.h(context, height),
       surfaceTintColor: Colors.transparent,
       iconTheme: IconThemeData(
-        color: iconColor ?? kBlack,
+        color: iconColor ?? kWhite,
         size: Responsive.w(context, 20),
       ),
       backgroundColor: color,
@@ -81,7 +81,7 @@ class AppbarWidget extends StatelessWidget implements PreferredSizeWidget {
           onPressed: onLeadingPressed ?? () => Navigator.maybePop(context),
           icon: Icon(
             Icons.arrow_back_ios,
-            color: iconColor ?? kBlack,
+            color: iconColor ?? kWhite,
             size: Responsive.w(context, 20),
           ),
           tooltip: 'Back',

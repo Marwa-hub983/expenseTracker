@@ -3,7 +3,7 @@
 // Check in to version control
 
 import 'package:hive_ce/hive.dart';
-import 'package:expense_trackerapp/features/home/domain/expense_model.dart';
+import 'package:expense_trackerapp/features/dashboard/domain/expense_model.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
